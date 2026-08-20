@@ -1,0 +1,124 @@
+  <section class="step" id="step1">
+    <h2><span class="no">STEP 1</span>線形探索を1手ずつ動かす</h2>
+    <p class="desc">先頭から順に1つずつ見ていきます。本文と同じ <span class="mono">[2, 5, 9, 1, 7]</span> です。探す値を選んでから動かしましょう。</p>
+    <div class="panel">
+      <div class="btn-row" style="flex-wrap:wrap">
+        <span class="badge">探す値</span>
+        <button class="btn sm" data-lt="2">2</button>
+        <button class="btn sm" data-lt="5">5</button>
+        <button class="btn sm" data-lt="9">9</button>
+        <button class="btn sm" data-lt="1">1</button>
+        <button class="btn sm" data-lt="7">7</button>
+        <button class="btn sm" data-lt="6">6（ない値）</button>
+      </div>
+      <div class="btn-row" style="margin-top:10px;flex-wrap:wrap">
+        <button class="btn primary" id="lStep">1手すすめる ▶</button>
+        <button class="btn" id="lPlay">自動で動かす</button>
+        <button class="btn ghost" id="lReset">最初から</button>
+        <span class="badge" id="lProg"></span>
+      </div>
+      <div class="grid c2" style="margin-top:14px">
+        <div>
+          <div class="cells" id="lCells"></div>
+          <div class="vars" id="lVars"></div>
+          <div class="metrics" style="margin-top:12px">
+            <div class="metric"><div class="k">調べた回数</div><div class="v" id="lCnt">0</div></div>
+          </div>
+        </div>
+        <div>
+          <pre class="code" id="lCode"></pre>
+          <div class="note" id="lNote" style="margin-top:12px"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="step" id="step2">
+    <h2><span class="no">STEP 2</span>二分探索を1手ずつ動かす</h2>
+    <p class="desc"><strong>並んでいること</strong>が前提です。真ん中と比べて、探す範囲を半分ずつ捨てていきます。本文と同じ <span class="mono">[3, 4, 6, 7, 11]</span> です。</p>
+    <div class="panel">
+      <div class="btn-row" style="flex-wrap:wrap">
+        <span class="badge">探す値</span>
+        <button class="btn sm" data-bt="3">3</button>
+        <button class="btn sm" data-bt="4">4</button>
+        <button class="btn sm" data-bt="6">6</button>
+        <button class="btn sm" data-bt="7">7</button>
+        <button class="btn sm" data-bt="11">11</button>
+        <button class="btn sm" data-bt="5">5（ない値）</button>
+      </div>
+      <div class="btn-row" style="margin-top:10px;flex-wrap:wrap">
+        <button class="btn primary" id="bStep">1手すすめる ▶</button>
+        <button class="btn" id="bPlay">自動で動かす</button>
+        <button class="btn ghost" id="bReset">最初から</button>
+        <span class="badge" id="bProg"></span>
+      </div>
+      <div class="grid c2" style="margin-top:14px">
+        <div>
+          <div class="cells" id="bCells"></div>
+          <div class="vars" id="bVars"></div>
+          <div class="metrics" style="margin-top:12px">
+            <div class="metric"><div class="k">調べた回数</div><div class="v" id="bCnt">0</div></div>
+            <div class="metric"><div class="k">残っている範囲</div><div class="v" id="bLeft">5 個</div></div>
+          </div>
+        </div>
+        <div>
+          <pre class="code" id="bCode"></pre>
+          <div class="note" id="bNote" style="margin-top:12px"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="step" id="step3">
+    <h2><span class="no">STEP 3</span>データが増えるとどれだけ差がつくか</h2>
+    <p class="desc">要素数を変えて、<strong>最悪の場合に何回調べるか</strong>を比べます。</p>
+    <div class="panel">
+      <label class="fld" for="nSize">要素数：<span class="mono" id="nSizeV">1000</span> 個</label>
+      <input type="range" id="nSize" min="1" max="7" step="1" value="4">
+      <div class="metrics" style="margin-top:12px">
+        <div class="metric"><div class="k">線形探索（最悪）</div><div class="v" id="linMax" style="font-size:1.5rem">—</div></div>
+        <div class="metric"><div class="k">二分探索（最悪）</div><div class="v" id="binMax" style="font-size:1.5rem">—</div></div>
+        <div class="metric"><div class="k">何分の1か</div><div class="v" id="ratio" style="font-size:1.2rem">—</div></div>
+      </div>
+      <div class="note" id="cmpNote" style="margin-top:12px"></div>
+      <hr class="sep">
+      <p class="qhead">実際に測ってみる</p>
+      <p class="desc" style="margin-top:0">その要素数の配列から、ランダムな値を100回探して<strong>平均の回数</strong>を数えます。</p>
+      <div class="btn-row"><button class="btn primary" id="bench">100回ためす</button></div>
+      <div class="tbl-scroll" style="margin-top:12px"><table class="tbl" id="benchTable"></table></div>
+      <div class="note info" style="margin-top:10px">
+        二分探索は1回調べるごとに範囲が半分になります。だから <span class="mono">1000 → 500 → 250 → 125 → …</span> と減り、
+        <strong>10回ほど</strong>で1個にしぼれます。線形探索は最悪1000回です。
+      </div>
+    </div>
+  </section>
+
+  <section class="step" id="step4">
+    <h2><span class="no">本文</span>線形探索の問題を解く（2-10）</h2>
+    <div class="panel" id="q10Box"></div>
+    <div class="note" id="q10Note" style="margin-top:10px"></div>
+  </section>
+
+  <section class="step" id="step5">
+    <h2><span class="no">本文</span>二分探索の問題を解く（2-11）</h2>
+    <div class="panel" id="q11Box"></div>
+    <div class="note" id="q11Note" style="margin-top:10px"></div>
+  </section>
+
+  <section class="step" id="glossary">
+    <h2><span class="no">用語</span>この節で出てくることば</h2>
+    <div class="panel"><div id="glossBox"></div></div>
+  </section>
+
+  <section class="step" id="wrap">
+    <h2><span class="no">まとめ</span>おさえておきたいこと</h2>
+    <div class="panel">
+      <ul class="bullets">
+        <li><strong>線形探索</strong>＝先頭から順に1つずつ。<strong>並んでいなくても使える</strong>し、処理が単純。ただし最悪 n 回かかる。</li>
+        <li><strong>二分探索</strong>＝真ん中と比べて範囲を半分にする。速いが、<strong>あらかじめ並んでいる必要がある</strong>。</li>
+        <li>添字は0から始まるので、要素数 n の配列の<strong>末尾の添字は n−1</strong>。線形探索の繰り返しは 0 から n−1 まで。</li>
+        <li>比べるのは添字ではなく<strong>中身</strong>：<span class="mono">Hairetsu[i] == tansakuchi</span>。</li>
+        <li>二分探索では <span class="mono">kijun ＝ (hajime + owari) ÷ 2</span>。中央より右にあるなら <span class="mono">hajime ＝ kijun + 1</span>、左なら <span class="mono">owari ＝ kijun − 1</span>。</li>
+      </ul>
+    </div>
+  </section>
