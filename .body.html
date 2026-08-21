@@ -69,8 +69,61 @@
     </div>
   </section>
 
+
+  <section class="step" id="stepGame">
+    <h2><span class="no">STEP 3</span>数当てゲームで「半分ずつ」を体感する</h2>
+    <p class="desc">1〜100 の数を当てます。<strong>1回言うたびに候補が本当に半分になっているか</strong>を、下のバーで確かめてください。</p>
+    <div class="panel">
+      <div class="btn-row">
+        <button class="btn primary" data-mode="you">あなたが当てる</button>
+        <button class="btn" data-mode="cpu">コンピュータが当てる</button>
+        <button class="btn ghost" id="gReset">はじめから</button>
+      </div>
+
+      <div id="gYou" style="margin-top:16px">
+        <p class="desc" style="margin-top:0">コンピュータが 1〜100 の数を1つ決めました。何回で当てられますか。</p>
+        <div class="btn-row">
+          <input type="number" id="gIn" class="mono pin" min="1" max="100" placeholder="1〜100">
+          <button class="btn primary" id="gSay">この数だと言う</button>
+        </div>
+      </div>
+
+      <div id="gCpu" hidden style="margin-top:16px">
+        <p class="desc" style="margin-top:0">あなたが 1〜100 の数を1つ心の中で決めてください。決めたら、コンピュータの質問に答えてください。</p>
+        <div class="guessq" id="gAsk"></div>
+        <div class="btn-row">
+          <button class="btn" data-ans="hi">もっと大きい</button>
+          <button class="btn" data-ans="lo">もっと小さい</button>
+          <button class="btn primary" data-ans="eq">当たり！</button>
+        </div>
+      </div>
+
+      <div class="rangebar" id="gBar" style="margin-top:16px"></div>
+      <div class="metrics" style="margin-top:14px">
+        <div class="metric"><div class="k">言った回数</div><div class="v" id="gCnt">0</div></div>
+        <div class="metric"><div class="k">残っている候補</div><div class="v" id="gLeft">100 個</div></div>
+        <div class="metric"><div class="k">二分探索なら最大</div><div class="v" id="gIdeal">7 回</div></div>
+      </div>
+      <div class="note" id="gNote" style="margin-top:12px"></div>
+      <div class="tbl-scroll" style="margin-top:12px"><table class="tbl" id="gLog"></table></div>
+    </div>
+  </section>
+
+  <section class="step" id="stepBad">
+    <h2><span class="no">実験</span>並んでいないデータに二分探索を使うと</h2>
+    <p class="desc">二分探索は「小さい順に並んでいること」が前提です。<strong>並べずに使うとどうなるか</strong>を実際に動かして確かめます。</p>
+    <div class="panel">
+      <div class="btn-row">
+        <button class="btn" data-bad="sorted">並んでいる [3,5,7,9,11,15,21] で 7 を探す</button>
+        <button class="btn" data-bad="unsorted">並んでいない [15,9,21,3,5,11,7] で 7 を探す</button>
+      </div>
+      <div class="cells" id="badCells" style="margin-top:14px"></div>
+      <div class="note" id="badNote" style="margin-top:12px">どちらかのボタンを押してください。</div>
+    </div>
+  </section>
+
   <section class="step" id="step3">
-    <h2><span class="no">STEP 3</span>データが増えるとどれだけ差がつくか</h2>
+    <h2><span class="no">STEP 4</span>データが増えるとどれだけ差がつくか</h2>
     <p class="desc">要素数を変えて、<strong>最悪の場合に何回調べるか</strong>を比べます。</p>
     <div class="panel">
       <label class="fld" for="nSize">要素数：<span class="mono" id="nSizeV">1000</span> 個</label>

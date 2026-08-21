@@ -6,8 +6,8 @@
 <title>探索のアルゴリズムを動かして理解する｜情報Ⅰ共通テスト対策問題集</title>
 <meta name="description" content="線形探索と二分探索を1手ずつ動かします。二分探索がなぜ速いのか、要素数を増やして回数を数えながら確かめましょう。">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Crect width=%2232%22 height=%2232%22 fill=%22%2315181c%22/%3E%3Ctext x=%2216%22 y=%2222%22 font-size=%2218%22 font-family=%22monospace%22 fill=%22%23fff%22 text-anchor=%22middle%22%3E01%3C/text%3E%3C/svg%3E">
-<link rel="stylesheet" href="css/style.css?v=239696b1">
-<link rel="stylesheet" href="css/app.css?v=c00d3294">
+<link rel="stylesheet" href="css/style.css?v=ea93572e">
+<link rel="stylesheet" href="css/app.css?v=aa1fe192">
 </head>
 <body>
 
@@ -92,8 +92,61 @@
     </div>
   </section>
 
+
+  <section class="step" id="stepGame">
+    <h2><span class="no">STEP 3</span>数当てゲームで「半分ずつ」を体感する</h2>
+    <p class="desc">1〜100 の数を当てます。<strong>1回言うたびに候補が本当に半分になっているか</strong>を、下のバーで確かめてください。</p>
+    <div class="panel">
+      <div class="btn-row">
+        <button class="btn primary" data-mode="you">あなたが当てる</button>
+        <button class="btn" data-mode="cpu">コンピュータが当てる</button>
+        <button class="btn ghost" id="gReset">はじめから</button>
+      </div>
+
+      <div id="gYou" style="margin-top:16px">
+        <p class="desc" style="margin-top:0">コンピュータが 1〜100 の数を1つ決めました。何回で当てられますか。</p>
+        <div class="btn-row">
+          <input type="number" id="gIn" class="mono pin" min="1" max="100" placeholder="1〜100">
+          <button class="btn primary" id="gSay">この数だと言う</button>
+        </div>
+      </div>
+
+      <div id="gCpu" hidden style="margin-top:16px">
+        <p class="desc" style="margin-top:0">あなたが 1〜100 の数を1つ心の中で決めてください。決めたら、コンピュータの質問に答えてください。</p>
+        <div class="guessq" id="gAsk"></div>
+        <div class="btn-row">
+          <button class="btn" data-ans="hi">もっと大きい</button>
+          <button class="btn" data-ans="lo">もっと小さい</button>
+          <button class="btn primary" data-ans="eq">当たり！</button>
+        </div>
+      </div>
+
+      <div class="rangebar" id="gBar" style="margin-top:16px"></div>
+      <div class="metrics" style="margin-top:14px">
+        <div class="metric"><div class="k">言った回数</div><div class="v" id="gCnt">0</div></div>
+        <div class="metric"><div class="k">残っている候補</div><div class="v" id="gLeft">100 個</div></div>
+        <div class="metric"><div class="k">二分探索なら最大</div><div class="v" id="gIdeal">7 回</div></div>
+      </div>
+      <div class="note" id="gNote" style="margin-top:12px"></div>
+      <div class="tbl-scroll" style="margin-top:12px"><table class="tbl" id="gLog"></table></div>
+    </div>
+  </section>
+
+  <section class="step" id="stepBad">
+    <h2><span class="no">実験</span>並んでいないデータに二分探索を使うと</h2>
+    <p class="desc">二分探索は「小さい順に並んでいること」が前提です。<strong>並べずに使うとどうなるか</strong>を実際に動かして確かめます。</p>
+    <div class="panel">
+      <div class="btn-row">
+        <button class="btn" data-bad="sorted">並んでいる [3,5,7,9,11,15,21] で 7 を探す</button>
+        <button class="btn" data-bad="unsorted">並んでいない [15,9,21,3,5,11,7] で 7 を探す</button>
+      </div>
+      <div class="cells" id="badCells" style="margin-top:14px"></div>
+      <div class="note" id="badNote" style="margin-top:12px">どちらかのボタンを押してください。</div>
+    </div>
+  </section>
+
   <section class="step" id="step3">
-    <h2><span class="no">STEP 3</span>データが増えるとどれだけ差がつくか</h2>
+    <h2><span class="no">STEP 4</span>データが増えるとどれだけ差がつくか</h2>
     <p class="desc">要素数を変えて、<strong>最悪の場合に何回調べるか</strong>を比べます。</p>
     <div class="panel">
       <label class="fld" for="nSize">要素数：<span class="mono" id="nSizeV">1000</span> 個</label>
@@ -151,15 +204,15 @@
     <div class="use-note">
       <h3>授業で</h3>
       <ul>
-        <li>STEP 1・2 を同じ探索値で動かし、何回で見つかるかを数えさせる。</li>
-        <li>STEP 3 で要素数を1000・100万と増やし、回数の差を見せてから二分探索の条件（並んでいること）を確認する。</li>
-        <li>STEP 2 では hajime・owari・kijun の値を声に出して読ませると、範囲がしぼられる感覚がつかめる。</li>
+        <li>STEP 3「コンピュータが当てる」を教室で実演し、必ず7回以内で当たることを見せてから理由を考えさせる。</li>
+        <li>「あなたが当てる」で各自の回数を集計し、7回以内だった人の言い方を共有する。</li>
+        <li>「実験」で並んでいないデータに二分探索を使うと失敗することを見せ、整列が前提である理由を確認する。</li>
       </ul>
       <h3 style="margin-top:12px">探究で</h3>
       <ul>
-        <li>辞書や名簿を引くとき、自分がどちらの方法を使っているかを考える。</li>
-        <li>並べかえる時間も含めると、どちらが得かを考える（1回だけ探す場合と何度も探す場合）。</li>
-        <li>二分探索が使えないデータの例を挙げ、その理由を説明する。</li>
+        <li>候補が 100 → 50 → 25 … と半分になる回数を式で表し、要素数と回数の関係を調べる。</li>
+        <li>クラス名簿・辞書・図書館の本など、身のまわりで二分探索が使える場面をさがす。</li>
+        <li>数当てゲームで「まん中以外を言う戦略」を試し、平均回数がどう変わるかを調べる。</li>
       </ul>
     </div>
   </section>
@@ -171,7 +224,7 @@
 </footer>
 
 <script src="js/terms.js?v=867e9694"></script>
-<script src="js/quiz.js?v=5d6779cc"></script>
-<script src="js/app.js?v=6b76b57b"></script>
+<script src="js/quiz.js?v=13402362"></script>
+<script src="js/app.js?v=b879e5b8"></script>
 </body>
 </html>

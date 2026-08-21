@@ -177,6 +177,150 @@
       (cap < n ? '<caption class="small" style="caption-side:bottom;color:var(--muted);text-align:left">※ 実測は ' + cap.toLocaleString() + ' 個で行いました</caption>' : '');
   }
 
+
+  /* ===================== 数当てゲーム（1〜100） ===================== */
+  const G = { mode: 'you', lo: 1, hi: 100, n: 0, secret: 0, log: [], over: false, ask: 0 };
+
+  function gBar() {
+    const w = 100, box = $('gBar');
+    let h = '';
+    for (let t = 10; t < 100; t += 10) h += '<span class="tick" style="left:' + t + '%"></span>';
+    h += '<span class="lab" style="left:4px">1</span><span class="lab" style="right:4px">100</span>';
+    const left = (G.lo - 1) / w * 100, width = (G.hi - G.lo + 1) / w * 100;
+    h += '<span class="live" style="left:' + left + '%;width:' + width + '%"></span>';
+    G.log.forEach(function (r) {
+      h += '<span class="say" style="left:' + ((r.g - 0.5) / w * 100) + '%;height:' + (r.ok ? 38 : 20) + 'px"></span>';
+    });
+    h += '<span class="cap">候補 ' + G.lo + ' 〜 ' + G.hi + '</span>';
+    box.innerHTML = h;
+    $('gCnt').textContent = G.n;
+    $('gLeft').textContent = (G.hi - G.lo + 1) + ' 個';
+    $('gIdeal').textContent = Math.ceil(Math.log2(100)) + ' 回';
+  }
+
+  function gLog() {
+    if (!G.log.length) { $('gLog').innerHTML = ''; return; }
+    $('gLog').innerHTML = '<thead><tr><th>回</th><th>言った数</th><th>返事</th><th>そのとき残っていた候補</th>' +
+      '<th>半分にできた？</th></tr></thead><tbody>' + G.log.map(function (r, i) {
+        const half = r.before / 2, good = r.after <= Math.ceil(half);
+        return '<tr><td>' + (i + 1) + '</td><td class="mono">' + r.g + '</td><td>' + r.msg + '</td>' +
+          '<td class="mono">' + r.before + ' → ' + r.after + '</td>' +
+          '<td class="' + (good ? 'near' : 'far') + '">' + (r.ok ? '—' : (good ? 'できた' : 'できていない')) + '</td></tr>';
+      }).join('') + '</tbody>';
+  }
+
+  function gStart(mode) {
+    G.mode = mode || G.mode; G.lo = 1; G.hi = 100; G.n = 0; G.log = []; G.over = false;
+    G.secret = 1 + Math.floor(Math.random() * 100);
+    $('gYou').hidden = G.mode !== 'you';
+    $('gCpu').hidden = G.mode !== 'cpu';
+    document.querySelectorAll('[data-mode]').forEach(b =>
+      b.classList.toggle('primary', b.dataset.mode === G.mode));
+    if ($('gIn')) $('gIn').value = '';
+    const n = $('gNote'); n.className = 'note info';
+    n.innerHTML = G.mode === 'you'
+      ? 'コンピュータが 1〜100 の数を決めました。<strong>何回で当てられるか</strong>試してください。'
+      : '1〜100 の数を心の中で決めて、コンピュータの質問に「もっと大きい／もっと小さい／当たり！」で答えてください。';
+    if (G.mode === 'cpu') gCpuAsk();
+    gBar(); gLog();
+  }
+
+  function gCpuAsk() {
+    G.ask = Math.floor((G.lo + G.hi) / 2);
+    $('gAsk').innerHTML = 'あなたの数は <strong>' + G.ask + '</strong> ですか？';
+  }
+
+  function gSay() {
+    if (G.over) return;
+    const g = Number($('gIn').value);
+    if (!g || g < 1 || g > 100) {
+      const n = $('gNote'); n.className = 'note warn';
+      n.textContent = '1〜100 の数を入れてください。'; return;
+    }
+    const before = G.hi - G.lo + 1;
+    G.n++;
+    let msg, ok = false;
+    if (g === G.secret) { ok = true; msg = '<strong>当たり！</strong>'; G.over = true; G.lo = G.hi = g; }
+    else if (g < G.secret) { msg = 'もっと大きい'; G.lo = Math.max(G.lo, g + 1); }
+    else { msg = 'もっと小さい'; G.hi = Math.min(G.hi, g - 1); }
+    G.log.push({ g: g, msg: msg, ok: ok, before: before, after: G.hi - G.lo + 1 });
+    gBar(); gLog();
+    const n = $('gNote');
+    if (ok) {
+      const ideal = Math.ceil(Math.log2(100));
+      n.className = 'note ' + (G.n <= ideal ? 'ok' : 'warn');
+      n.innerHTML = '<strong>' + G.n + ' 回で当たりました。</strong>' +
+        (G.n <= ideal
+          ? '二分探索の最大 ' + ideal + ' 回以内です。毎回まん中を言えていたということです。'
+          : '二分探索なら <strong>最大 ' + ideal + ' 回</strong>で必ず当たります。表の「半分にできた？」を見て、どの回でむだが出たか確かめましょう。') +
+        '<br>100 → 50 → 25 → 13 → 7 → 4 → 2 → 1 と、<strong>7回で候補が1個になる</strong>のが二分探索です。';
+    } else {
+      n.className = 'note info';
+      n.innerHTML = '答えは「' + msg + '」。候補は <strong>' + before + ' 個 → ' + (G.hi - G.lo + 1) + ' 個</strong>になりました。' +
+        '次に言うとよい数は、いまの候補のまん中 <strong>' + Math.floor((G.lo + G.hi) / 2) + '</strong> です。';
+    }
+    $('gIn').value = '';
+  }
+
+  function gAnswer(kind) {
+    if (G.over) return;
+    const before = G.hi - G.lo + 1;
+    G.n++;
+    let msg, ok = false;
+    if (kind === 'eq') { ok = true; msg = '<strong>当たり！</strong>'; G.over = true; G.lo = G.hi = G.ask; }
+    else if (kind === 'hi') { msg = 'もっと大きい'; G.lo = G.ask + 1; }
+    else { msg = 'もっと小さい'; G.hi = G.ask - 1; }
+    G.log.push({ g: G.ask, msg: msg, ok: ok, before: before, after: G.hi - G.lo + 1 });
+    gBar(); gLog();
+    const n = $('gNote');
+    if (ok) {
+      n.className = 'note ok';
+      n.innerHTML = '<strong>' + G.n + ' 回で当てました。</strong>コンピュータは毎回、残っている候補の<strong>まん中</strong>を聞いています。' +
+        '候補が 100 → 50 → 25 → 13 → 7 → 4 → 2 → 1 と半分ずつ減るので、<strong>どんな数でも7回以内</strong>で必ず当たります。' +
+        'これが二分探索の強さです。';
+    } else if (G.lo > G.hi) {
+      n.className = 'note ng';
+      n.innerHTML = '候補がなくなりました。<strong>途中の返事がどこかで食いちがっています。</strong>' +
+        '二分探索は「返事が正しい」ことが前提です。「はじめから」でもう一度どうぞ。';
+      G.over = true;
+    } else {
+      n.className = 'note info';
+      n.innerHTML = '候補は <strong>' + before + ' 個 → ' + (G.hi - G.lo + 1) + ' 個</strong>。あと <strong>' +
+        Math.ceil(Math.log2(G.hi - G.lo + 1)) + ' 回以内</strong>で必ず当たります。';
+      gCpuAsk();
+    }
+  }
+
+  /* ===================== 実験：並んでいないデータに二分探索 ===================== */
+  const BAD = { sorted: [3, 5, 7, 9, 11, 15, 21], unsorted: [15, 9, 21, 3, 5, 11, 7] };
+  function runBad(kind) {
+    const a = BAD[kind].slice(), t = 7;
+    let lo = 0, hi = a.length - 1, seen = [], found = -1;
+    while (lo <= hi) {
+      const m = Math.floor((lo + hi) / 2);
+      seen.push(m);
+      if (a[m] === t) { found = m; break; }
+      if (a[m] < t) lo = m + 1; else hi = m - 1;
+    }
+    $('badCells').innerHTML = a.map(function (v, i) {
+      const c = i === found ? 'hit' : (seen.indexOf(i) >= 0 ? 'miss' : '');
+      return '<div class="c ' + c + '">' + v + '<em>[' + i + ']</em></div>';
+    }).join('');
+    const n = $('badNote');
+    const at = a.indexOf(t);
+    if (found >= 0) {
+      n.className = 'note ok';
+      n.innerHTML = '<strong>' + seen.length + ' 回で見つかりました（添字 ' + found + '）。</strong>' +
+        '小さい順に並んでいるので、「まん中より大きい／小さい」でどちら側を捨てるか正しく決められます。';
+    } else {
+      n.className = 'note ng';
+      n.innerHTML = '<strong>7 は配列の中（添字 ' + at + '）にあるのに、「見つかりません」で終わりました。</strong>' +
+        '調べたのは添字 ' + seen.join(' → ') + ' の ' + seen.length +' か所だけ。' +
+        '並んでいないと「まん中より大きいから右側にあるはず」という判断が成り立たず、' +
+        '<strong>正しい側をまるごと捨ててしまいます</strong>。二分探索は必ず<strong>整列してから</strong>使います。';
+    }
+  }
+
   function init() {
     const lReset = runner('l', linFrames, drawLin, LIN, 9);
     const bReset = runner('b', binFrames, drawBin, BIN, 11);
@@ -185,6 +329,14 @@
     $('nSize').addEventListener('input', drawCmp);
     $('bench').addEventListener('click', bench);
     drawCmp(); bench();
+
+    gStart('you');
+    document.querySelectorAll('[data-mode]').forEach(b => b.addEventListener('click', () => gStart(b.dataset.mode)));
+    $('gReset').addEventListener('click', () => gStart());
+    $('gSay').addEventListener('click', gSay);
+    $('gIn').addEventListener('keydown', e => { if (e.key === 'Enter') gSay(); });
+    document.querySelectorAll('[data-ans]').forEach(b => b.addEventListener('click', () => gAnswer(b.dataset.ans)));
+    document.querySelectorAll('[data-bad]').forEach(b => b.addEventListener('click', () => runBad(b.dataset.bad)));
 
     Quiz.choice('q10Box', 'q10Note', [
       { k: 'ア', q: '線形探索の特徴として最も適当なものは。',
