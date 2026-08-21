@@ -182,19 +182,19 @@
   const G = { mode: 'you', lo: 1, hi: 100, n: 0, secret: 0, log: [], over: false, ask: 0 };
 
   function gBar() {
-    const w = 100, box = $('gBar');
-    let h = '';
+    const box = $('gBar');
+    const left = (G.lo - 1), width = (G.hi - G.lo + 1);
+    let h = '<span class="live" style="left:' + left + '%;width:' + width + '%"></span>';
     for (let t = 10; t < 100; t += 10) h += '<span class="tick" style="left:' + t + '%"></span>';
-    h += '<span class="lab" style="left:4px">1</span><span class="lab" style="right:4px">100</span>';
-    const left = (G.lo - 1) / w * 100, width = (G.hi - G.lo + 1) / w * 100;
-    h += '<span class="live" style="left:' + left + '%;width:' + width + '%"></span>';
     G.log.forEach(function (r) {
-      h += '<span class="say" style="left:' + ((r.g - 0.5) / w * 100) + '%;height:' + (r.ok ? 38 : 20) + 'px"></span>';
+      h += '<span class="say' + (r.ok ? ' hit' : '') + '" style="left:' + (r.g - 0.5) + '%"></span>';
     });
-    h += '<span class="cap">候補 ' + G.lo + ' 〜 ' + G.hi + '</span>';
+    const cx = Math.min(88, Math.max(12, left + width / 2));
+    h += '<span class="cap" style="left:' + cx + '%">候補 ' + G.lo + ' 〜 ' + G.hi + '（' + width + ' 個）</span>';
+    h += '<span class="lab" style="left:4px">1</span><span class="lab" style="right:4px">100</span>';
     box.innerHTML = h;
     $('gCnt').textContent = G.n;
-    $('gLeft').textContent = (G.hi - G.lo + 1) + ' 個';
+    $('gLeft').textContent = width + ' 個';
     $('gIdeal').textContent = Math.ceil(Math.log2(100)) + ' 回';
   }
 
